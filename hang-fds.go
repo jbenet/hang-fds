@@ -39,11 +39,19 @@ func fdRaise(nn int) error {
 		return err
 	}
 
-	if rLimit.Cur >= n {
+	if uint64(rLimit.Cur) >= n {
 		fmt.Printf("already at %d >= %d fds\n", rLimit.Cur, n)
 		return nil // all good.
 	}
-	rLimit.Cur = n
+	var i interface{} = &rLimit.Cur
+	switch i := i.(type) {
+	case *uint64:
+		*i = uint64(n)
+	case *int64:
+		*i = int64(n)
+	default:
+		return fmt.Errorf("error message")
+	}
 
 	err = syscall.Setrlimit(syscall.RLIMIT_NOFILE, &rLimit)
 	if err != nil {
@@ -55,7 +63,7 @@ func fdRaise(nn int) error {
 		return err
 	}
 
-	if rLimit.Cur < n {
+	if uint64(rLimit.Cur) < n {
 		return fmt.Errorf("failed to raise fd limit to %d (still %d)", n, rLimit.Cur)
 	}
 
