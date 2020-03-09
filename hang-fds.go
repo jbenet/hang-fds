@@ -55,7 +55,7 @@ func dialAndHang(i int, m ma.Multiaddr, errs chan<- error) {
 
 func fdHang(n int, m ma.Multiaddr, hold time.Duration) error {
 	// first, make sure we raise our own fds to be enough.
-	if err := fdRaise(n + 10); err != nil {
+	if err := fdRaise(n + 20); err != nil {
 		return err
 	}
 
